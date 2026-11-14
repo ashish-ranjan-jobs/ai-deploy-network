@@ -23,12 +23,11 @@ settings = get_settings()
 
 
 def init_db_and_seed():
-    """Create database tables and ensure admin user exists."""
+    """Verify relational tables and ensure root admin exists."""
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
     try:
-        # Check if admin already exists
         admin = db.query(User).filter(User.email == settings.ADMIN_EMAIL.lower()).first()
         if not admin:
             admin_user = User(
@@ -36,9 +35,9 @@ def init_db_and_seed():
                 last_name="Network",
                 email=settings.ADMIN_EMAIL.lower(),
                 password_hash=hash_password(settings.ADMIN_PASSWORD),
-                title="AI Deploy Network Director",
+                title="Lead Registry Curator",
                 company="AI Deploy Network",
-                bio="Administrator & Lead Verifier for AI Deploy Network.",
+                bio="Technical verifier for production architectures.",
                 is_verified=True,
                 is_admin=True,
             )
@@ -46,7 +45,7 @@ def init_db_and_seed():
             db.commit()
             db.refresh(admin_user)
 
-            # Assign #001 Founding Admin Membership
+            # Assign Founding Builder #001
             membership = Membership(
                 user_id=admin_user.id,
                 membership_number=1,
@@ -62,16 +61,17 @@ def init_db_and_seed():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
     init_db_and_seed()
     yield
-    # Shutdown
 
 
 app = FastAPI(
     title=settings.APP_NAME,
-    description="The Global Directory of Proven AI Implementations and Founding Builders.",
-    version="1.0.0",
+    description="Independent Peer Registry of Validated AI Implementations.",
+    version="1.1.0",
+    docs_url="/aideploy/docs",
+    redoc_url="/aideploy/redoc",
+    openapi_url="/aideploy/openapi.json",
     lifespan=lifespan,
 )
 
@@ -84,13 +84,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Static Files
+# Static files mounted under /aideploy/static
 static_dir = Path(__file__).resolve().parent / "static"
 static_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+app.mount("/aideploy/static", StaticFiles(directory=str(static_dir)), name="aideploy-static")
 
 # Mount Routers
 app.include_router(web_router)
+app.include_router(auth_router, prefix="/aideploy")
+app.include_router(builders_router, prefix="/aideploy")
+app.include_router(deployments_router, prefix="/aideploy")
+app.include_router(search_router, prefix="/aideploy")
+app.include_router(admin_router, prefix="/aideploy")
+
+# Also include un-prefixed routers so unit tests and direct calls work
 app.include_router(auth_router)
 app.include_router(builders_router)
 app.include_router(deployments_router)
@@ -98,12 +105,14 @@ app.include_router(search_router)
 app.include_router(admin_router)
 
 
+@app.get("/aideploy/api/health", tags=["Health"])
 @app.get("/api/health", tags=["Health"])
 def health_check():
     return {
         "status": "healthy",
         "app": settings.APP_NAME,
         "environment": settings.APP_ENV,
+        "base_path": settings.BASE_PATH,
     }
 
 

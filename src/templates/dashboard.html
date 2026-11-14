@@ -1,225 +1,191 @@
 {% extends "base.html" %}
 
-{% block title %}Builder Dashboard — AI Deploy Network{% endblock %}
+{% block title %}Dashboard — AI Deploy Network{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-  <!-- Welcome & Profile Header -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+  <!-- Header Section -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-zinc-800 gap-4 mb-8">
     <div>
-      <div class="flex items-center space-x-3 mb-2">
-        <h1 class="text-3xl font-black text-slate-900">{{ current_user.full_name }}</h1>
+      <div class="flex items-center space-x-3 mb-1">
+        <h1 class="text-2xl font-bold text-white">{{ current_user.full_name }}</h1>
         {% if current_user.membership %}
-          <span class="gold-badge text-xs font-bold px-3 py-1 rounded-full flex items-center space-x-1">
-            <i class="fa-solid fa-crown text-[10px]"></i>
-            <span>{{ current_user.membership.badge_label }}</span>
+          <span class="font-mono-code text-[11px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded">
+            {{ current_user.membership.badge_label }}
           </span>
         {% endif %}
       </div>
-      <p class="text-sm text-slate-600">
-        {{ current_user.title or 'AI Practitioner' }} &bull; {{ current_user.company or 'Independent' }} &bull; {{ current_user.location or 'Global' }}
+      <p class="text-xs text-zinc-400 font-mono-code">
+        {{ current_user.title or 'AI Systems Engineer' }} &bull; {{ current_user.company or 'Independent' }} &bull; {{ current_user.location or 'Global' }}
       </p>
     </div>
 
-    <!-- Quick action buttons -->
-    <div class="flex flex-wrap items-center gap-3">
-      <a href="/deployments/new" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition flex items-center space-x-1.5">
-        <i class="fa-solid fa-plus"></i>
-        <span>Add AI Deployment</span>
+    <div class="flex items-center space-x-2 text-xs font-mono-code">
+      <a href="/aideploy/deployments/new" class="bg-zinc-100 hover:bg-white text-zinc-950 font-semibold px-3 py-1.5 rounded transition">
+        + ADD_DEPLOYMENT
       </a>
-      <a href="/profile/{{ current_user.id }}" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        <span>Public Profile</span>
+      <a href="/aideploy/profile/{{ current_user.id }}" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 px-3 py-1.5 rounded transition">
+        PUBLIC_VIEW
       </a>
-      <a href="/api/builders/{{ current_user.id }}/export-pdf" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5">
-        <i class="fa-solid fa-file-pdf text-red-400"></i>
-        <span>Export PDF Portfolio</span>
+      <a href="/aideploy/api/builders/{{ current_user.id }}/export-pdf" class="bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 px-3 py-1.5 rounded transition flex items-center space-x-1">
+        <span>EXPORT_PDF</span>
       </a>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     
-    <!-- Left Column: Founding Builder Credential Card & Verification Roadmap -->
+    <!-- Left Column: Physical Developer Credential Card & Audit Checklist -->
     <div class="space-y-6">
       
-      <!-- Founding Builder Card -->
-      <div class="founding-card rounded-3xl p-6 text-white relative overflow-hidden shadow-2xl">
-        <div class="absolute -right-6 -bottom-6 opacity-10 text-9xl">
-          <i class="fa-solid fa-microchip"></i>
-        </div>
-
-        <div class="flex items-center justify-between mb-6">
+      <!-- Credential Card -->
+      <div class="credential-card rounded-xl p-5 font-mono-code text-xs shadow-2xl">
+        <div class="flex items-center justify-between pb-3 border-b border-zinc-800/80 mb-4">
           <div class="flex items-center space-x-2">
-            <span class="bg-amber-500 text-slate-950 font-black text-xs px-2 py-1 rounded">AI DEPLOY</span>
-            <span class="text-xs font-semibold text-amber-300">FOUNDING BUILDER</span>
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span class="text-zinc-300 font-bold tracking-wider">AI DEPLOY REGISTRY</span>
           </div>
-          <i class="fa-solid fa-shield-halved text-amber-400 text-xl"></i>
+          <span class="text-[10px] text-zinc-500">OFFICIAL SPEC</span>
         </div>
 
-        <div class="mb-6">
-          <div class="text-xs text-slate-400 uppercase tracking-widest font-mono">Unique Membership Number</div>
-          <div class="text-4xl font-black text-amber-400 tracking-wider font-mono">
-            {{ current_user.membership.formatted_number if current_user.membership else '#000' }}
-          </div>
-        </div>
-
-        <div class="pt-4 border-t border-slate-800/80 flex items-end justify-between">
+        <div class="space-y-3">
           <div>
-            <div class="text-xs text-slate-400">Builder Name</div>
-            <div class="text-sm font-bold text-white">{{ current_user.full_name }}</div>
+            <div class="text-[10px] text-zinc-500">MEMBER_DESIGNATION</div>
+            <div class="text-zinc-200 font-bold text-sm tracking-wide">FOUNDING BUILDER</div>
           </div>
-          <div class="text-right">
-            <div class="text-xs text-slate-400">Status</div>
-            {% if current_user.is_verified %}
-              <div class="text-xs font-bold text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>Verified</div>
-            {% else %}
-              <div class="text-xs font-bold text-amber-300"><i class="fa-solid fa-clock mr-1"></i>Review Pending</div>
-            {% endif %}
+
+          <div>
+            <div class="text-[10px] text-zinc-500">REGISTRY_SERIAL_NUMBER</div>
+            <div class="text-2xl font-black text-amber-400 tracking-wider">
+              {{ current_user.membership.formatted_number if current_user.membership else '#000' }}
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-zinc-800/80 flex items-center justify-between text-[11px]">
+            <div>
+              <div class="text-[10px] text-zinc-500">ISSUED_TO</div>
+              <div class="text-zinc-300 font-semibold truncate max-w-[140px]">{{ current_user.full_name }}</div>
+            </div>
+            <div class="text-right">
+              <div class="text-[10px] text-zinc-500">STATUS</div>
+              {% if current_user.is_verified %}
+                <div class="text-emerald-400 font-bold">VERIFIED</div>
+              {% else %}
+                <div class="text-amber-400 font-bold">AUDIT_PENDING</div>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Verification Roadmap Tracker -->
-      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center justify-between">
-          <span>Verification Checklist</span>
-          <span class="text-xs text-blue-600 font-semibold lowercase">
-            {% if current_user.is_verified %}verified{% elif deployments %}in review{% else %}action needed{% endif %}
+      <!-- Verification Audit Pipeline -->
+      <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-5 text-xs font-mono-code">
+        <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-3 text-zinc-400">
+          <span>VERIFICATION_STAGES</span>
+          <span class="text-[10px]">
+            {% if current_user.is_verified %}[3/3 COMPLETE]{% elif deployments %}[2/3 IN_REVIEW]{% else %}[1/3 ACTION_REQ]{% endif %}
           </span>
-        </h3>
+        </div>
 
-        <div class="space-y-4">
-          <div class="flex items-start space-x-3 text-xs">
-            <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-              <i class="fa-solid fa-check text-[10px]"></i>
-            </div>
+        <div class="space-y-3 font-sans">
+          <div class="flex items-start space-x-2.5">
+            <span class="text-emerald-400 font-mono-code font-bold mt-0.5">&check;</span>
             <div>
-              <div class="font-bold text-slate-900">1. Register Builder Account</div>
-              <div class="text-slate-500">Free Founding Builder membership assigned.</div>
+              <div class="text-zinc-200 font-semibold text-xs">1. Register Account</div>
+              <div class="text-zinc-500 text-[11px]">Founding slot allocated. Free membership confirmed.</div>
             </div>
           </div>
 
-          <div class="flex items-start space-x-3 text-xs">
-            <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-              <i class="fa-solid fa-check text-[10px]"></i>
-            </div>
+          <div class="flex items-start space-x-2.5">
+            <span class="text-emerald-400 font-mono-code font-bold mt-0.5">&check;</span>
             <div>
-              <div class="font-bold text-slate-900">2. Complete Builder Profile</div>
-              <div class="text-slate-500">Title, links, and background recorded.</div>
+              <div class="text-zinc-200 font-semibold text-xs">2. Complete Builder Profile</div>
+              <div class="text-zinc-500 text-[11px]">Engineering title, bio, and repository coordinates.</div>
             </div>
           </div>
 
-          <div class="flex items-start space-x-3 text-xs">
+          <div class="flex items-start space-x-2.5">
             {% if deployments %}
-              <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-                <i class="fa-solid fa-check text-[10px]"></i>
-              </div>
+              <span class="text-emerald-400 font-mono-code font-bold mt-0.5">&check;</span>
             {% else %}
-              <div class="w-5 h-5 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5 font-bold">
-                !
-              </div>
+              <span class="text-amber-400 font-mono-code font-bold mt-0.5">&bull;</span>
             {% endif %}
             <div>
-              <div class="font-bold text-slate-900">3. Add Genuine AI Deployment</div>
-              <div class="text-slate-500">
+              <div class="text-zinc-200 font-semibold text-xs">3. Add Genuine AI Deployment</div>
+              <div class="text-zinc-500 text-[11px]">
                 {% if deployments %}
-                  {{ deployments|length }} deployment(s) added.
+                  {{ deployments|length }} case study(ies) documented.
                 {% else %}
-                  <span class="text-amber-600 font-semibold">Add at least one deployment to qualify.</span>
+                  <span class="text-amber-400">Add at least one genuine deployment to qualify for verification.</span>
                 {% endif %}
               </div>
             </div>
           </div>
-
-          <div class="flex items-start space-x-3 text-xs">
-            {% if current_user.is_verified %}
-              <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
-                <i class="fa-solid fa-check text-[10px]"></i>
-              </div>
-              <div>
-                <div class="font-bold text-emerald-700">4. Verified by AI Deploy Network</div>
-                <div class="text-slate-500">Profile certified and discoverable to employers worldwide.</div>
-              </div>
-            {% else %}
-              <div class="w-5 h-5 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 mt-0.5">
-                <i class="fa-solid fa-hourglass-half text-[10px]"></i>
-              </div>
-              <div>
-                <div class="font-bold text-slate-700">4. Verification Review</div>
-                <div class="text-slate-500">Reviewed for genuine production deployment & measurable impact.</div>
-              </div>
-            {% endif %}
-          </div>
         </div>
       </div>
+
     </div>
 
-    <!-- Right Column: Documented Deployments List -->
-    <div class="lg:col-span-2 space-y-6">
-      
-      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-        <div class="flex items-center justify-between mb-6">
+    <!-- Right Column: Case Studies Registry -->
+    <div class="lg:col-span-2">
+      <div class="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
+        <div class="flex items-center justify-between pb-4 border-b border-zinc-800 mb-5">
           <div>
-            <h2 class="text-xl font-black text-slate-900">Your AI Deployments</h2>
-            <p class="text-xs text-slate-500">Document your production models, architecture, and measurable ROI</p>
+            <h2 class="text-sm font-bold text-zinc-100 font-mono-code uppercase">Documented Deployments ({{ deployments|length }})</h2>
+            <p class="text-xs text-zinc-500 mt-0.5">Production implementations, technical telemetry, and verified metrics</p>
           </div>
-          <a href="/deployments/new" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center space-x-1">
-            <i class="fa-solid fa-plus"></i>
-            <span>Add New</span>
+          <a href="/aideploy/deployments/new" class="text-xs font-mono-code text-zinc-300 hover:text-white border border-zinc-700 px-2 py-1 rounded bg-zinc-800">
+            + NEW_RECORD
           </a>
         </div>
 
         {% if deployments %}
           <div class="space-y-4">
             {% for d in deployments %}
-              <div class="p-5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/50 transition">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+              <div class="bg-zinc-950/70 border border-zinc-800/80 rounded-lg p-4 text-xs font-mono-code">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-zinc-900">
                   <div class="flex items-center space-x-2">
-                    <h3 class="font-bold text-slate-900 text-base">{{ d.title }}</h3>
-                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">{{ d.industry }}</span>
+                    <span class="font-bold text-zinc-100 text-sm font-sans">{{ d.title }}</span>
+                    <span class="text-[10px] text-zinc-400 px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 rounded">{{ d.industry }}</span>
                   </div>
                   <div>
                     {% if d.is_verified %}
-                      <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center space-x-1">
-                        <i class="fa-solid fa-circle-check text-[10px]"></i>
-                        <span>Verified</span>
-                      </span>
+                      <span class="text-emerald-400 text-[11px] font-bold">VERIFIED_SPEC</span>
                     {% elif d.verification_status == 'REJECTED' %}
-                      <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-100 text-red-800">
-                        Needs Revision
-                      </span>
+                      <span class="text-red-400 text-[11px]">NEEDS_REVISION</span>
                     {% else %}
-                      <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 flex items-center space-x-1">
-                        <i class="fa-solid fa-clock text-[10px]"></i>
-                        <span>Pending Review</span>
-                      </span>
+                      <span class="text-amber-400 text-[11px]">PENDING_AUDIT</span>
                     {% endif %}
                   </div>
                 </div>
 
-                <div class="text-xs text-slate-500 mb-3">
-                  <strong>Tech Stack:</strong> {{ d.ai_tech_used }} &bull; <strong>Stage:</strong> {{ d.deployment_stage }}
+                <div class="py-2.5 text-zinc-400 text-[11px]">
+                  <span>STACK: <strong class="text-zinc-300">{{ d.ai_tech_used }}</strong></span>
+                  <span class="text-zinc-600 mx-1.5">|</span>
+                  <span>STAGE: {{ d.deployment_stage }}</span>
+                  <span class="text-zinc-600 mx-1.5">|</span>
+                  <span>HARDWARE: {{ d.hardware_target or 'Cloud Inference' }}</span>
                 </div>
 
-                <div class="bg-emerald-50/80 border border-emerald-100 p-3 rounded-xl mb-3 text-xs">
-                  <div class="font-bold text-emerald-900 uppercase tracking-wide text-[10px]">Measurable Results:</div>
-                  <div class="text-emerald-950 font-medium mt-0.5">{{ d.measurable_results }}</div>
+                <!-- Measurable impact delta -->
+                <div class="metric-box p-3 rounded my-2 text-zinc-300 text-[11px] font-sans">
+                  <span class="font-mono-code text-[10px] text-emerald-400 font-bold block mb-0.5">BENCHMARKED_RESULTS:</span>
+                  {{ d.measurable_results }}
                 </div>
 
-                <div class="flex items-center justify-between pt-3 border-t border-slate-200/60 text-xs">
-                  <div class="text-slate-400">Added on {{ d.created_at.strftime('%b %d, %Y') }}</div>
+                <div class="pt-2 flex items-center justify-between text-[11px] text-zinc-500">
+                  <span>CREATED: {{ d.created_at.strftime('%Y-%m-%d') }}</span>
                   <div class="flex items-center space-x-3">
-                    <a href="/api/deployments/{{ d.id }}/export-pdf" class="text-slate-600 hover:text-slate-900 font-semibold" title="Export PDF Case Study">
-                      <i class="fa-solid fa-file-pdf mr-1 text-red-500"></i>PDF
+                    <a href="/aideploy/api/deployments/{{ d.id }}/export-pdf" class="text-zinc-400 hover:text-zinc-200">
+                      [PDF]
                     </a>
-                    <a href="/deployments/{{ d.id }}/edit" class="text-blue-600 hover:text-blue-800 font-semibold">
-                      Edit
+                    <a href="/aideploy/deployments/{{ d.id }}/edit" class="text-zinc-400 hover:text-zinc-200">
+                      [EDIT]
                     </a>
-                    <form action="/deployments/{{ d.id }}/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this deployment?');" class="inline">
-                      <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">
-                        Delete
+                    <form action="/aideploy/deployments/{{ d.id }}/delete" method="POST" onsubmit="return confirm('Delete this deployment record?');" class="inline">
+                      <button type="submit" class="text-red-400/80 hover:text-red-300">
+                        [DELETE]
                       </button>
                     </form>
                   </div>
@@ -228,24 +194,21 @@
             {% endfor %}
           </div>
         {% else %}
-          <div class="py-12 text-center border-2 border-dashed border-slate-200 rounded-2xl p-6">
-            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3 text-xl">
-              <i class="fa-solid fa-diagram-project"></i>
-            </div>
-            <h4 class="font-bold text-slate-800 text-sm mb-1">No AI Deployments Added Yet</h4>
-            <p class="text-xs text-slate-500 max-w-sm mx-auto mb-4">
-              Add at least one genuine AI Deployment you have built or contributed to, showing measurable results, so your profile can be verified.
+          <div class="border border-dashed border-zinc-800 rounded-lg p-8 text-center text-xs font-mono-code text-zinc-500">
+            <div>NO_DEPLOYMENTS_RECORDED</div>
+            <p class="font-sans text-zinc-400 mt-1 max-w-sm mx-auto">
+              Add at least one genuine AI Deployment you've built or contributed to, showing measurable metrics, to verify your Builder Profile.
             </p>
-            <a href="/deployments/new" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition inline-flex items-center space-x-1">
-              <i class="fa-solid fa-plus"></i>
-              <span>Add Your First AI Deployment</span>
-            </a>
+            <div class="mt-4">
+              <a href="/aideploy/deployments/new" class="text-amber-400 hover:underline">
+                Publish First Deployment &rarr;
+              </a>
+            </div>
           </div>
         {% endif %}
       </div>
-
     </div>
-  </div>
 
+  </div>
 </div>
 {% endblock %}

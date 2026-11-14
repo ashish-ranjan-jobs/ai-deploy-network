@@ -1,51 +1,45 @@
 {% extends "base.html" %}
 
-{% block title %}Builder Sign In — AI Deploy Network{% endblock %}
+{% block title %}Sign In — AI Deploy Network{% endblock %}
 
 {% block content %}
-<div class="py-16 px-4 sm:px-6 lg:px-8 max-w-md mx-auto">
-  <div class="bg-white p-8 sm:p-10 rounded-3xl border border-slate-200 shadow-xl">
+<div class="py-16 px-4 sm:px-6 lg:px-8 max-w-sm mx-auto">
+  <div class="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-7 sm:p-8">
     
-    <div class="text-center mb-6">
-      <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl font-black">
-        AI
-      </div>
-      <h1 class="text-2xl font-black text-slate-900">Sign In to Your Profile</h1>
-      <p class="text-xs text-slate-500 mt-1">Manage your verified AI deployments and credentials</p>
+    <div class="mb-6">
+      <div class="font-mono-code text-[11px] text-zinc-500 mb-1">AUTH // SESSION</div>
+      <h1 class="text-xl font-bold text-white tracking-tight">Builder Sign In</h1>
+      <p class="text-xs text-zinc-400 mt-1">Manage verified records and membership card.</p>
     </div>
 
     {% if error %}
-      <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center space-x-2">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span>{{ error }}</span>
+      <div class="mb-4 p-3 rounded-md bg-red-950/40 border border-red-800/80 text-red-300 text-xs font-mono-code">
+        [ERROR]: {{ error }}
       </div>
     {% endif %}
 
-    <form action="/login" method="POST" class="space-y-4">
+    <form action="/aideploy/login" method="POST" class="space-y-4 text-xs font-sans">
       <div>
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Address</label>
-        <input type="email" name="email" required placeholder="you@example.com"
-               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">EMAIL_ADDRESS</label>
+        <input type="email" name="email" required placeholder="user@domain.io"
+               class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+        <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">PASSWORD</label>
         <input type="password" name="password" required placeholder="Your password"
-               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+               class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
       </div>
 
       <div class="pt-2">
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
-          <span>Sign In to Dashboard</span>
-          <i class="fa-solid fa-arrow-right text-xs"></i>
+        <button type="submit" class="w-full bg-zinc-100 hover:bg-white text-zinc-950 font-semibold py-2 px-4 rounded-md transition font-mono-code text-xs">
+          AUTHENTICATE &rarr;
         </button>
       </div>
 
-      <div class="pt-6 border-t border-slate-100 text-center text-xs text-slate-600">
-        Don't have an account yet? <br>
-        <a href="/register" class="font-bold text-amber-600 hover:text-amber-700 mt-1 inline-block">
-          Become a Founding Builder (Free) &rarr;
-        </a>
+      <div class="pt-4 border-t border-zinc-800 text-center text-xs text-zinc-400 font-mono-code">
+        NO ACCOUNT YET? <br>
+        <a href="/aideploy/register" class="text-amber-400 hover:underline mt-1 inline-block">CLAIM FOUNDING SPOT</a>
       </div>
     </form>
   </div>

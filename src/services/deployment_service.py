@@ -12,7 +12,6 @@ from src.schemas.verification import VerificationReview
 
 
 def create_deployment(db: Session, user_id: int, data: DeploymentCreate) -> Deployment:
-    """Create a new AI deployment showcase and submit for verification."""
     deployment = Deployment(
         user_id=user_id,
         title=data.title,
@@ -20,6 +19,7 @@ def create_deployment(db: Session, user_id: int, data: DeploymentCreate) -> Depl
         industry=data.industry,
         ai_tech_used=data.ai_tech_used,
         deployment_stage=data.deployment_stage,
+        hardware_target=data.hardware_target or "Cloud (GPU/vLLM)",
         problem_statement=data.problem_statement,
         solution_description=data.solution_description,
         measurable_results=data.measurable_results,
@@ -32,7 +32,6 @@ def create_deployment(db: Session, user_id: int, data: DeploymentCreate) -> Depl
     db.commit()
     db.refresh(deployment)
 
-    # Create verification audit record
     verif = Verification(
         deployment_id=deployment.id,
         status="PENDING",
@@ -44,7 +43,6 @@ def create_deployment(db: Session, user_id: int, data: DeploymentCreate) -> Depl
 
 
 def get_deployment_by_id(db: Session, deployment_id: int) -> Optional[Deployment]:
-    """Get single deployment by ID with author details."""
     return (
         db.query(Deployment)
         .options(joinedload(Deployment.user).joinedload(User.membership))
@@ -54,12 +52,10 @@ def get_deployment_by_id(db: Session, deployment_id: int) -> Optional[Deployment
 
 
 def list_user_deployments(db: Session, user_id: int) -> List[Deployment]:
-    """List all deployments owned by a user."""
     return db.query(Deployment).filter(Deployment.user_id == user_id).order_by(Deployment.created_at.desc()).all()
 
 
 def list_verified_deployments(db: Session, skip: int = 0, limit: int = 50) -> List[Deployment]:
-    """List public verified deployments."""
     return (
         db.query(Deployment)
         .options(joinedload(Deployment.user).joinedload(User.membership))
@@ -80,7 +76,6 @@ def search_deployments(
     skip: int = 0,
     limit: int = 50,
 ) -> List[Deployment]:
-    """Search deployments by keyword, industry, and technology stack."""
     q = db.query(Deployment).options(joinedload(Deployment.user).joinedload(User.membership))
 
     if verified_only:
@@ -94,6 +89,7 @@ def search_deployments(
                 Deployment.problem_statement.ilike(pattern),
                 Deployment.solution_description.ilike(pattern),
                 Deployment.measurable_results.ilike(pattern),
+                Deployment.ai_tech_used.ilike(pattern),
             )
         )
 
@@ -112,7 +108,6 @@ def update_deployment(
     user_id: int,
     data: DeploymentUpdate,
 ) -> Optional[Deployment]:
-    """Update user's deployment."""
     deployment = db.query(Deployment).filter(Deployment.id == deployment_id, Deployment.user_id == user_id).first()
     if not deployment:
         return None
@@ -121,16 +116,14 @@ def update_deployment(
     for key, value in update_dict.items():
         setattr(deployment, key, value)
 
-    # Any update resets verification to PENDING
     deployment.is_verified = False
     deployment.verification_status = "PENDING"
     deployment.updated_at = datetime.now(timezone.utc)
 
-    # Add verification log
     verif = Verification(
         deployment_id=deployment.id,
         status="PENDING",
-        feedback_notes="Deployment updated by author; awaiting re-verification.",
+        feedback_notes="Spec updated; queued for re-verification.",
     )
     db.add(verif)
     db.commit()
@@ -139,7 +132,6 @@ def update_deployment(
 
 
 def delete_deployment(db: Session, deployment_id: int, user_id: int) -> bool:
-    """Delete a deployment owned by user."""
     deployment = db.query(Deployment).filter(Deployment.id == deployment_id, Deployment.user_id == user_id).first()
     if not deployment:
         return False
@@ -154,7 +146,6 @@ def review_deployment(
     reviewer_id: int,
     review_data: VerificationReview,
 ) -> Optional[Deployment]:
-    """Admin review of a deployment submission."""
     deployment = db.query(Deployment).filter(Deployment.id == deployment_id).first()
     if not deployment:
         return None
@@ -163,13 +154,13 @@ def review_deployment(
     deployment.is_verified = is_approved
     deployment.verification_status = review_data.status
     deployment.updated_at = datetime.now(timezone.utc)
+    if is_approved:
+        deployment.verification_hash = deployment.compute_audit_hash()
 
-    # Also check if user has at least one verified deployment -> user.is_verified = True
     user = db.query(User).filter(User.id == deployment.user_id).first()
     if user and is_approved:
         user.is_verified = True
 
-    # Record verification event
     verif = Verification(
         deployment_id=deployment.id,
         reviewer_id=reviewer_id,

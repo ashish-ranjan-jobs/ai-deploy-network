@@ -1,87 +1,81 @@
 {% extends "base.html" %}
 
-{% block title %}Discover Verified AI Deployments & Builders — AI Deploy Network{% endblock %}
+{% block title %}Directory — AI Deploy Network{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
 
-  <!-- Search Header -->
-  <div class="max-w-3xl mb-8">
-    <h1 class="text-3xl font-black text-slate-900">AI Implementation Directory</h1>
-    <p class="text-sm text-slate-600 mt-2">
-      Search and connect with professionals who can demonstrate what they've actually built, deployed and achieved in production AI.
+  <div class="max-w-2xl mb-8">
+    <div class="font-mono-code text-[11px] text-zinc-500 mb-1">REGISTRY // DISCOVERY_PORTAL</div>
+    <h1 class="text-2xl font-bold text-white tracking-tight">AI Implementation Directory</h1>
+    <p class="text-xs text-zinc-400 mt-1">
+      Filter verified AI architectures and connect with engineers demonstrating actual production results.
     </p>
   </div>
 
-  <!-- Filter & Search Controls -->
-  <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm mb-10">
-    <form action="/search" method="GET" class="space-y-4">
+  <!-- Search & Filter Controls -->
+  <div class="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 mb-8">
+    <form action="/aideploy/search" method="GET" class="space-y-4 text-xs font-mono-code">
       
       <div class="flex flex-col md:flex-row gap-3">
         <!-- Search Keyword Input -->
-        <div class="relative flex-grow">
-          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
+        <div class="relative flex-grow font-sans">
           <input
             type="text"
             name="q"
             value="{{ query or '' }}"
-            placeholder="Search by keywords, models, problem statement, or metrics..."
-            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Search keywords, stack, metrics (e.g. pgvector, vLLM, latency)..."
+            class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3.5 py-2 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 font-mono-code"
           >
         </div>
 
         <!-- Industry Filter -->
-        <div class="w-full md:w-56">
-          <select name="industry" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">All Industries</option>
+        <div class="w-full md:w-52">
+          <select name="industry" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-zinc-500">
+            <option value="">ALL_INDUSTRIES</option>
             <option value="FinTech" {% if industry == 'FinTech' %}selected{% endif %}>FinTech / Banking</option>
             <option value="Healthcare" {% if industry == 'Healthcare' %}selected{% endif %}>Healthcare & BioTech</option>
-            <option value="E-Commerce" {% if industry == 'E-Commerce' %}selected{% endif %}>E-Commerce</option>
             <option value="Enterprise SaaS" {% if industry == 'Enterprise SaaS' %}selected{% endif %}>Enterprise SaaS</option>
-            <option value="LegalTech" {% if industry == 'LegalTech' %}selected{% endif %}>LegalTech</option>
+            <option value="E-Commerce" {% if industry == 'E-Commerce' %}selected{% endif %}>E-Commerce & Retail</option>
             <option value="DevTools" {% if industry == 'DevTools' %}selected{% endif %}>DevTools & MLOps</option>
-            <option value="Logistics" {% if industry == 'Logistics' %}selected{% endif %}>Logistics</option>
+            <option value="LegalTech" {% if industry == 'LegalTech' %}selected{% endif %}>LegalTech</option>
           </select>
         </div>
 
         <!-- AI Tech Stack Filter -->
-        <div class="w-full md:w-56">
+        <div class="w-full md:w-52">
           <input
             type="text"
             name="tech"
             value="{{ tech or '' }}"
-            placeholder="AI Stack (e.g. RAG, LLM)"
-            class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Stack (e.g. RAG, vLLM)"
+            class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
           >
         </div>
 
-        <!-- View Switcher -->
         <input type="hidden" name="view" value="{{ view_mode }}">
 
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow transition shrink-0 flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-filter"></i>
-          <span>Apply Filters</span>
+        <button type="submit" class="bg-zinc-100 hover:bg-white text-zinc-950 font-semibold px-4 py-2 rounded-lg transition shrink-0">
+          APPLY_FILTER
         </button>
       </div>
 
-      <!-- Secondary Filter Row -->
-      <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-100 text-xs">
-        <div class="flex items-center space-x-4">
-          <label class="flex items-center space-x-2 cursor-pointer text-slate-700">
-            <input type="checkbox" name="verified_only" value="true" {% if verified_only %}checked{% endif %} class="rounded text-blue-600 focus:ring-blue-500">
-            <span class="font-semibold">Only Verified Implementations</span>
-          </label>
-        </div>
+      <!-- Secondary Controls Bar -->
+      <div class="flex flex-wrap items-center justify-between pt-3 border-t border-zinc-800 text-[11px] text-zinc-400">
+        <label class="flex items-center space-x-2 cursor-pointer">
+          <input type="checkbox" name="verified_only" value="true" {% if verified_only %}checked{% endif %} class="rounded bg-zinc-950 border-zinc-700 text-amber-500 focus:ring-0">
+          <span>ONLY_VERIFIED_IMPLEMENTATIONS</span>
+        </label>
 
-        <!-- View Toggles (Deployments vs Builders) -->
-        <div class="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 mt-2 sm:mt-0">
-          <a href="/search?view=deployments{% if query %}&q={{ query }}{% endif %}{% if industry %}&industry={{ industry }}{% endif %}"
-             class="px-3 py-1 rounded-md text-xs font-semibold transition {% if view_mode != 'builders' %}bg-white text-slate-900 shadow-sm{% else %}text-slate-500 hover:text-slate-900{% endif %}">
-            Deployments ({{ deployments|length if deployments else 0 }})
+        <!-- View Switcher -->
+        <div class="inline-flex rounded border border-zinc-800 p-0.5 bg-zinc-950 mt-2 sm:mt-0">
+          <a href="/aideploy/search?view=deployments{% if query %}&q={{ query }}{% endif %}{% if industry %}&industry={{ industry }}{% endif %}"
+             class="px-2.5 py-1 rounded text-[11px] transition {% if view_mode != 'builders' %}bg-zinc-800 text-zinc-100 font-semibold{% else %}text-zinc-500 hover:text-zinc-300{% endif %}">
+            DEPLOYMENTS ({{ deployments|length if deployments else 0 }})
           </a>
-          <a href="/search?view=builders{% if query %}&q={{ query }}{% endif %}"
-             class="px-3 py-1 rounded-md text-xs font-semibold transition {% if view_mode == 'builders' %}bg-white text-slate-900 shadow-sm{% else %}text-slate-500 hover:text-slate-900{% endif %}">
-            Builders ({{ builders|length if builders else 0 }})
+          <a href="/aideploy/search?view=builders{% if query %}&q={{ query }}{% endif %}"
+             class="px-2.5 py-1 rounded text-[11px] transition {% if view_mode == 'builders' %}bg-zinc-800 text-zinc-100 font-semibold{% else %}text-zinc-500 hover:text-zinc-300{% endif %}">
+            BUILDERS ({{ builders|length if builders else 0 }})
           </a>
         </div>
       </div>
@@ -89,111 +83,102 @@
     </form>
   </div>
 
-  <!-- Results View -->
+  <!-- Results Content -->
   {% if view_mode == 'builders' %}
-    <!-- Builders Directory Grid -->
     {% if builders %}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {% for b in builders %}
-          <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm card-hover flex flex-col justify-between">
+          <div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-5 flex flex-col justify-between transition hover:border-zinc-700 text-xs">
             <div>
-              <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg uppercase">
+              <div class="flex items-center justify-between mb-3 font-mono-code text-[11px]">
+                <div class="w-8 h-8 rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-amber-400">
                   {{ b.first_name[0] }}{{ b.last_name[0] }}
                 </div>
                 {% if b.membership %}
-                  <span class="gold-badge text-[11px] font-bold px-2.5 py-0.5 rounded-full">
+                  <span class="text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
                     {{ b.membership.badge_label }}
                   </span>
                 {% endif %}
               </div>
 
-              <h3 class="font-bold text-lg text-slate-900">{{ b.full_name }}</h3>
-              <p class="text-xs text-slate-600 mb-2 font-medium">
+              <h3 class="font-bold text-sm text-zinc-100 mb-0.5">{{ b.full_name }}</h3>
+              <p class="text-zinc-400 text-[11px] font-mono-code mb-2">
                 {{ b.title or 'AI Specialist' }} {% if b.company %}&bull; {{ b.company }}{% endif %}
               </p>
 
               {% if b.bio %}
-                <p class="text-xs text-slate-500 line-clamp-3 mb-4 leading-relaxed">{{ b.bio }}</p>
+                <p class="text-zinc-400 text-xs line-clamp-2 mb-3 leading-relaxed font-sans">{{ b.bio }}</p>
               {% endif %}
 
-              <div class="text-[11px] text-slate-500 mb-4">
-                <span class="font-semibold text-slate-700">{{ b.deployments|length }}</span> documented AI deployments
+              <div class="text-[11px] text-zinc-500 font-mono-code">
+                RECORDS: {{ b.deployments|length }} documented
               </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span class="text-slate-400">{{ b.location or 'Global' }}</span>
-              <a href="/profile/{{ b.id }}" class="font-bold text-blue-600 hover:text-blue-800">
-                View Profile &rarr;
+            <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-[11px] font-mono-code text-zinc-400 mt-4">
+              <span>{{ b.location or 'Global' }}</span>
+              <a href="/aideploy/profile/{{ b.id }}" class="text-zinc-200 hover:underline">
+                PROFILE &rarr;
               </a>
             </div>
           </div>
         {% endfor %}
       </div>
     {% else %}
-      <div class="bg-white p-12 rounded-3xl border border-slate-200 text-center max-w-md mx-auto text-xs text-slate-500">
-        No builders match your search criteria.
+      <div class="border border-dashed border-zinc-800 rounded-xl p-8 text-center text-xs font-mono-code text-zinc-500">
+        NO_BUILDERS_MATCHING_FILTER
       </div>
     {% endif %}
 
   {% else %}
-    <!-- Deployments Grid -->
     {% if deployments %}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {% for d in deployments %}
-          <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between card-hover">
+          <div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-5 flex flex-col justify-between transition hover:border-zinc-700 text-xs">
             <div>
-              <div class="flex items-center justify-between gap-2 mb-3">
-                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                  {{ d.industry }}
-                </span>
+              <div class="flex items-center justify-between font-mono-code text-[11px] mb-2.5">
+                <span class="text-zinc-400 border border-zinc-800 bg-zinc-950 px-2 py-0.5 rounded">{{ d.industry }}</span>
                 {% if d.is_verified %}
-                  <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center space-x-1">
-                    <i class="fa-solid fa-check text-[10px]"></i>
-                    <span>Verified</span>
-                  </span>
+                  <span class="text-emerald-400 font-bold">VERIFIED</span>
                 {% else %}
-                  <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
-                    Pending
-                  </span>
+                  <span class="text-amber-400">PENDING_AUDIT</span>
                 {% endif %}
               </div>
 
-              <h3 class="font-bold text-slate-900 text-lg mb-1 line-clamp-2">{{ d.title }}</h3>
+              <h3 class="font-bold text-sm text-zinc-100 mb-1 leading-snug">
+                <a href="/aideploy/profile/{{ d.user_id }}">{{ d.title }}</a>
+              </h3>
 
-              <div class="text-xs text-slate-500 mb-3">
-                By <a href="/profile/{{ d.user_id }}" class="font-bold text-slate-800 hover:text-blue-600">{{ d.user.full_name }}</a>
+              <div class="text-[11px] font-mono-code text-zinc-400 mb-2.5">
+                BY <a href="/aideploy/profile/{{ d.user_id }}" class="text-zinc-300 hover:underline">{{ d.user.full_name }}</a>
                 {% if d.user.membership %}
-                  <span class="text-amber-600 font-semibold ml-1">{{ d.user.membership.badge_label }}</span>
+                  <span class="text-amber-400 ml-1">[{{ d.user.membership.badge_label }}]</span>
                 {% endif %}
               </div>
 
-              <p class="text-xs text-slate-600 line-clamp-3 mb-4 leading-relaxed">
+              <p class="text-zinc-400 text-xs line-clamp-3 mb-3 leading-relaxed font-sans">
                 {{ d.solution_description }}
               </p>
 
-              <!-- Measurable Impact -->
-              <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-2xl mb-4">
-                <div class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider mb-0.5">Measurable Impact:</div>
-                <div class="text-xs text-emerald-950 font-medium line-clamp-2">{{ d.measurable_results }}</div>
+              <!-- Measurable impact -->
+              <div class="metric-box p-3 rounded mb-3 text-[11px] font-mono-code">
+                <div class="text-[10px] text-emerald-400 font-bold uppercase mb-0.5">BENCHMARKED_RESULTS:</div>
+                <div class="text-zinc-200 line-clamp-2 font-sans">{{ d.measurable_results }}</div>
               </div>
             </div>
 
-            <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span class="text-slate-500 truncate max-w-[170px]" title="{{ d.ai_tech_used }}">
-                <i class="fa-solid fa-microchip text-slate-400 mr-1"></i>{{ d.ai_tech_used }}
-              </span>
-              <a href="/profile/{{ d.user_id }}" class="font-bold text-blue-600 hover:text-blue-800">
-                Case Study &rarr;
+            <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-[11px] font-mono-code text-zinc-400">
+              <span class="truncate max-w-[170px]" title="{{ d.ai_tech_used }}">{{ d.ai_tech_used }}</span>
+              <a href="/aideploy/profile/{{ d.user_id }}" class="text-zinc-200 hover:underline">
+                SPEC &rarr;
               </a>
             </div>
           </div>
         {% endfor %}
       </div>
     {% else %}
-      <div class="bg-white p-12 rounded-3xl border border-slate-200 text-center max-w-md mx-auto text-xs text-slate-500">
-        No AI deployments found matching your filters.
+      <div class="border border-dashed border-zinc-800 rounded-xl p-8 text-center text-xs font-mono-code text-zinc-500">
+        NO_DEPLOYMENTS_FOUND_MATCHING_FILTER
       </div>
     {% endif %}
   {% endif %}

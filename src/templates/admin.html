@@ -1,108 +1,103 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Verification Portal — AI Deploy Network{% endblock %}
+{% block title %}Registry Verification Portal — AI Deploy Network{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
 
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-    <div>
-      <div class="inline-flex items-center space-x-1.5 bg-purple-50 text-purple-700 text-xs font-bold px-3 py-1 rounded-full mb-2 border border-purple-200">
-        <i class="fa-solid fa-shield-halved"></i>
-        <span>AI Deploy Network Administration</span>
-      </div>
-      <h1 class="text-3xl font-black text-slate-900">Verification & Quality Portal</h1>
-      <p class="text-xs text-slate-500 mt-1">Review AI deployment submissions, inspect measurable metrics, and approve verified credentials.</p>
+  <div class="mb-8">
+    <div class="font-mono-code text-[11px] text-amber-400 mb-1">REGISTRY_CONTROL // AUDIT_PORTAL</div>
+    <h1 class="text-2xl font-bold text-white tracking-tight">Deployment Verification Portal</h1>
+    <p class="text-xs text-zinc-400 mt-1">Review candidate AI deployments, verify quantified benchmarks, and certify credentials.</p>
+  </div>
+
+  <!-- Telemetry Metrics Grid -->
+  <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8 font-mono-code text-xs">
+    <div class="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl">
+      <div class="text-[10px] text-zinc-500">PENDING_AUDITS</div>
+      <div class="text-2xl font-bold text-amber-400 mt-1">{{ stats.pending_deployments }}</div>
+    </div>
+    <div class="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl">
+      <div class="text-[10px] text-zinc-500">VERIFIED_SPECS</div>
+      <div class="text-2xl font-bold text-emerald-400 mt-1">{{ stats.verified_deployments }}</div>
+    </div>
+    <div class="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl">
+      <div class="text-[10px] text-zinc-500">TOTAL_SPECS</div>
+      <div class="text-2xl font-bold text-zinc-100 mt-1">{{ stats.total_deployments }}</div>
+    </div>
+    <div class="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl">
+      <div class="text-[10px] text-zinc-500">TOTAL_BUILDERS</div>
+      <div class="text-2xl font-bold text-zinc-100 mt-1">{{ stats.total_users }}</div>
+    </div>
+    <div class="bg-zinc-900/60 border border-zinc-800 p-4 rounded-xl col-span-2 lg:col-span-1">
+      <div class="text-[10px] text-zinc-500">FOUNDING_ALLOCATIONS</div>
+      <div class="text-2xl font-bold text-amber-400 mt-1">{{ stats.total_founding_members }} / 500</div>
     </div>
   </div>
 
-  <!-- KPI Metric Cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-      <div class="text-xs text-slate-400 font-semibold uppercase">Pending Reviews</div>
-      <div class="text-2xl font-black text-amber-600 mt-1">{{ stats.pending_deployments }}</div>
-    </div>
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-      <div class="text-xs text-slate-400 font-semibold uppercase">Verified Deployments</div>
-      <div class="text-2xl font-black text-emerald-600 mt-1">{{ stats.verified_deployments }}</div>
-    </div>
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-      <div class="text-xs text-slate-400 font-semibold uppercase">Total Deployments</div>
-      <div class="text-2xl font-black text-slate-900 mt-1">{{ stats.total_deployments }}</div>
-    </div>
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-      <div class="text-xs text-slate-400 font-semibold uppercase">Total Builders</div>
-      <div class="text-2xl font-black text-blue-600 mt-1">{{ stats.total_users }}</div>
-    </div>
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm col-span-2 lg:col-span-1">
-      <div class="text-xs text-slate-400 font-semibold uppercase">Founding Builders</div>
-      <div class="text-2xl font-black text-purple-600 mt-1">{{ stats.total_founding_members }} / 500</div>
-    </div>
-  </div>
-
-  <!-- Pending Submissions Queue -->
-  <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
-    <div class="flex items-center justify-between mb-6">
+  <!-- Pending Audits Queue -->
+  <div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6">
+    <div class="flex items-center justify-between pb-4 border-b border-zinc-800 mb-6 font-mono-code">
       <div>
-        <h2 class="text-xl font-black text-slate-900">Submissions Awaiting Verification ({{ pending_deployments|length }})</h2>
-        <p class="text-xs text-slate-500">Ensure the implementation contains clear architectural evidence and quantifiable results.</p>
+        <h2 class="text-sm font-bold text-zinc-100">CANDIDATE_AUDIT_QUEUE ({{ pending_deployments|length }})</h2>
+        <p class="text-xs text-zinc-500 mt-0.5 font-sans">Verify quantified benchmarks, hardware targets, and architectural evidence.</p>
       </div>
     </div>
 
     {% if pending_deployments %}
       <div class="space-y-6">
         {% for d in pending_deployments %}
-          <div class="p-6 rounded-2xl border border-slate-200 bg-slate-50/50">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+          <div class="bg-zinc-950 border border-zinc-800 rounded-lg p-5 text-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-zinc-900 font-mono-code text-[11px]">
               <div>
-                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800">{{ d.industry }}</span>
-                <span class="ml-2 text-xs font-mono text-slate-500">{{ d.deployment_stage }}</span>
+                <span class="text-zinc-300 font-bold font-sans text-sm">{{ d.title }}</span>
+                <span class="ml-2 text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded">{{ d.industry }}</span>
+                <span class="ml-1 text-zinc-500">{{ d.deployment_stage }}</span>
               </div>
-              <div class="text-xs text-slate-500">
-                Submitted by <strong>{{ d.user.full_name }}</strong> ({{ d.user.email }})
-              </div>
-            </div>
-
-            <h3 class="text-lg font-bold text-slate-900 mb-2">{{ d.title }}</h3>
-            <p class="text-xs text-slate-600 mb-3">
-              <strong>AI Stack:</strong> {{ d.ai_tech_used }}
-              {% if d.client_or_company %} &bull; <strong>Client:</strong> {{ d.client_or_company }}{% endif %}
-            </p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-xs">
-              <div class="bg-white p-3.5 rounded-xl border border-slate-200">
-                <span class="font-bold text-slate-800 uppercase text-[10px] block mb-1">Problem:</span>
-                <p class="text-slate-600 leading-relaxed">{{ d.problem_statement }}</p>
-              </div>
-              <div class="bg-white p-3.5 rounded-xl border border-slate-200">
-                <span class="font-bold text-slate-800 uppercase text-[10px] block mb-1">Solution:</span>
-                <p class="text-slate-600 leading-relaxed">{{ d.solution_description }}</p>
+              <div class="text-zinc-400">
+                SUBMITTER: {{ d.user.full_name }} ({{ d.user.email }})
               </div>
             </div>
 
-            <div class="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl mb-4 text-xs">
-              <span class="font-bold text-emerald-900 uppercase text-[10px] block mb-1">Measurable Results:</span>
-              <p class="text-emerald-950 font-semibold">{{ d.measurable_results }}</p>
+            <div class="py-2.5 font-mono-code text-[11px] text-zinc-400">
+              <span>STACK: <strong class="text-zinc-200">{{ d.ai_tech_used }}</strong></span>
+              <span class="text-zinc-600 mx-1.5">|</span>
+              <span>TARGET: {{ d.hardware_target or 'Cloud Inference' }}</span>
+              {% if d.client_or_company %} &bull; <span>CLIENT: {{ d.client_or_company }}</span>{% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3 font-sans">
+              <div class="bg-zinc-900/50 p-3 rounded border border-zinc-800/80">
+                <span class="font-mono-code text-[10px] text-zinc-400 block mb-1">PROBLEM:</span>
+                <p class="text-zinc-300 leading-relaxed">{{ d.problem_statement }}</p>
+              </div>
+              <div class="bg-zinc-900/50 p-3 rounded border border-zinc-800/80">
+                <span class="font-mono-code text-[10px] text-zinc-400 block mb-1">ARCHITECTURE:</span>
+                <p class="text-zinc-300 leading-relaxed">{{ d.solution_description }}</p>
+              </div>
+            </div>
+
+            <div class="metric-box p-3 rounded mb-4 font-mono-code">
+              <span class="text-[10px] text-emerald-400 font-bold block mb-0.5">BENCHMARKED_RESULTS:</span>
+              <p class="text-zinc-100 font-sans leading-relaxed">{{ d.measurable_results }}</p>
             </div>
 
             <!-- Review Actions Form -->
-            <form action="/admin/verify/{{ d.id }}" method="POST" class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-end gap-3">
-              <div class="w-full">
-                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Reviewer Feedback Notes</label>
-                <input type="text" name="feedback_notes" placeholder="e.g. Excellent documented results. Verified production deployment."
-                       class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white">
+            <form action="/aideploy/admin/verify/{{ d.id }}" method="POST" class="pt-3 border-t border-zinc-900 flex flex-col sm:flex-row items-end gap-3 font-mono-code">
+              <div class="w-full font-sans">
+                <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">AUDITOR_COMMENTS</label>
+                <input type="text" name="feedback_notes" placeholder="e.g. Verified production throughput benchmarks and latency delta."
+                       class="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-1.5 text-xs text-zinc-100 focus:outline-none focus:border-zinc-500 font-mono-code">
               </div>
 
               <div class="flex items-center space-x-2 shrink-0">
                 <button type="submit" name="status" value="APPROVED"
-                        class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center space-x-1">
-                  <i class="fa-solid fa-check"></i>
-                  <span>Approve & Verify</span>
+                        class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3.5 py-1.5 rounded transition">
+                  APPROVE_SPEC
                 </button>
                 <button type="submit" name="status" value="REJECTED"
-                        class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center space-x-1">
-                  <i class="fa-solid fa-xmark"></i>
-                  <span>Needs Revision</span>
+                        class="bg-red-950 border border-red-800 text-red-300 hover:bg-red-900 font-semibold text-xs px-3.5 py-1.5 rounded transition">
+                  REQUEST_REVISION
                 </button>
               </div>
             </form>
@@ -110,10 +105,8 @@
         {% endfor %}
       </div>
     {% else %}
-      <div class="py-12 text-center text-xs text-slate-500">
-        <i class="fa-solid fa-circle-check text-emerald-500 text-3xl mb-2"></i>
-        <div class="font-bold text-slate-700 text-sm mt-1">All caught up!</div>
-        <div>No pending AI deployment submissions in the verification queue.</div>
+      <div class="border border-dashed border-zinc-800 rounded-lg p-10 text-center text-xs font-mono-code text-zinc-500">
+        NO_PENDING_AUDITS_IN_QUEUE
       </div>
     {% endif %}
   </div>
