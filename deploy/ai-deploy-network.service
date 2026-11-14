@@ -1,0 +1,18 @@
+[Unit]
+Description=AI Deploy Network Builder Platform
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/ai-deploy-network
+EnvironmentFile=/root/ai-deploy-network/.env
+Environment=PATH=/root/ai-deploy-network/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+ExecStart=/root/ai-deploy-network/venv/bin/uvicorn src.main:app --host 127.0.0.1 --port 8000 --workers 2
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
