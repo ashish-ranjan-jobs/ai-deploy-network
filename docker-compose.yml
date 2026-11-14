@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    container_name: ai_deploy_network_web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=AI Deploy Network
+      - APP_ENV=production
+      - APP_PORT=8000
+      - SECRET_KEY=production-secret-ai-deploy-network-token-key-2026
+      - DATABASE_URL=sqlite:///./ai_deploy_network.db
+      - MAX_FOUNDING_BUILDERS=500
+      - ADMIN_EMAIL=admin@aideploynetwork.com
+      - ADMIN_PASSWORD=AdminProductionSecure2026!
+    volumes:
+      - app_data:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  app_data:

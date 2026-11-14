@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ builder.full_name }} — AI Deploy Network Builder Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+  <!-- Builder Header Card -->
+  <div class="bg-white rounded-3xl border border-slate-200 p-8 sm:p-10 shadow-sm mb-10">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-slate-100">
+      
+      <div class="flex items-start space-x-4">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-black text-2xl uppercase shadow-md shrink-0">
+          {{ builder.first_name[0] }}{{ builder.last_name[0] }}
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900">{{ builder.full_name }}</h1>
+            {% if builder.membership %}
+              <span class="gold-badge text-xs font-bold px-3 py-1 rounded-full flex items-center space-x-1">
+                <i class="fa-solid fa-crown text-[10px]"></i>
+                <span>{{ builder.membership.badge_label }}</span>
+              </span>
+            {% endif %}
+            {% if builder.is_verified %}
+              <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center space-x-1">
+                <i class="fa-solid fa-check text-[10px]"></i>
+                <span>Verified Builder</span>
+              </span>
+            {% endif %}
+          </div>
+          <p class="text-sm font-medium text-slate-600">
+            {{ builder.title or 'AI Systems Engineer' }}
+            {% if builder.company %} &bull; <span class="text-slate-800">{{ builder.company }}</span>{% endif %}
+            {% if builder.location %} &bull; <span>{{ builder.location }}</span>{% endif %}
+          </p>
+        </div>
+      </div>
+
+      <!-- Action: Export PDF Portfolio -->
+      <div class="flex items-center space-x-3 shrink-0">
+        <a href="/api/builders/{{ builder.id }}/export-pdf" class="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-file-pdf text-red-400"></i>
+          <span>Download Certified PDF</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Contact & External Links -->
+    <div class="flex flex-wrap items-center gap-4 pt-6 text-xs text-slate-600">
+      <div class="flex items-center space-x-1">
+        <i class="fa-solid fa-envelope text-slate-400"></i>
+        <span>{{ builder.email }}</span>
+      </div>
+      {% if builder.linkedin_url %}
+        <a href="{{ builder.linkedin_url }}" target="_blank" rel="noopener" class="text-blue-600 hover:underline flex items-center space-x-1">
+          <i class="fa-brands fa-linkedin"></i>
+          <span>LinkedIn</span>
+        </a>
+      {% endif %}
+      {% if builder.github_url %}
+        <a href="{{ builder.github_url }}" target="_blank" rel="noopener" class="text-slate-900 hover:underline flex items-center space-x-1">
+          <i class="fa-brands fa-github"></i>
+          <span>GitHub</span>
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Bio -->
+    {% if builder.bio %}
+      <div class="mt-6 pt-6 border-t border-slate-100">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">About & AI Specialization</h3>
+        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{{ builder.bio }}</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Deployments Section -->
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-black text-slate-900">Documented AI Deployments</h2>
+      <p class="text-xs text-slate-500">Real-world production case studies with measurable outcomes</p>
+    </div>
+    <span class="text-xs font-bold text-slate-500">{{ deployments|length }} case study(ies)</span>
+  </div>
+
+  {% if deployments %}
+    <div class="space-y-6">
+      {% for d in deployments %}
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                {{ d.industry }}
+              </span>
+              <span class="ml-2 text-xs text-slate-500 font-mono">{{ d.deployment_stage }}</span>
+            </div>
+            <div>
+              {% if d.is_verified %}
+                <span class="text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 flex items-center space-x-1">
+                  <i class="fa-solid fa-circle-check text-[10px]"></i>
+                  <span>Verified AI Implementation</span>
+                </span>
+              {% else %}
+                <span class="text-xs font-medium px-3 py-1 rounded-full bg-amber-100 text-amber-800">
+                  Pending Verification Review
+                </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <h3 class="text-xl font-bold text-slate-900 mb-2">{{ d.title }}</h3>
+
+          <div class="text-xs text-slate-600 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+            <strong>AI & Systems Stack:</strong> {{ d.ai_tech_used }}
+            {% if d.client_or_company %} &bull; <strong>Organisation:</strong> {{ d.client_or_company }}{% endif %}
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-xs">
+            <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
+              <h4 class="font-bold text-slate-900 uppercase tracking-wide text-[11px] mb-1">Problem Addressed:</h4>
+              <p class="text-slate-600 leading-relaxed">{{ d.problem_statement }}</p>
+            </div>
+            <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
+              <h4 class="font-bold text-slate-900 uppercase tracking-wide text-[11px] mb-1">Engineered Solution:</h4>
+              <p class="text-slate-600 leading-relaxed">{{ d.solution_description }}</p>
+            </div>
+          </div>
+
+          <!-- Measurable Results Highlight -->
+          <div class="bg-emerald-50 border border-emerald-200/80 p-4 rounded-2xl mb-4">
+            <div class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1 flex items-center space-x-1.5">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Demonstrated Measurable Impact:</span>
+            </div>
+            <div class="text-sm font-semibold text-emerald-950 leading-relaxed">
+              {{ d.measurable_results }}
+            </div>
+          </div>
+
+          <!-- Links & PDF export -->
+          <div class="flex flex-wrap items-center justify-between pt-4 border-t border-slate-100 text-xs">
+            <div class="flex items-center space-x-4">
+              {% if d.live_demo_url %}
+                <a href="{{ d.live_demo_url }}" target="_blank" rel="noopener" class="text-blue-600 hover:underline flex items-center space-x-1">
+                  <i class="fa-solid fa-link"></i>
+                  <span>Live Demo</span>
+                </a>
+              {% endif %}
+              {% if d.repo_url %}
+                <a href="{{ d.repo_url }}" target="_blank" rel="noopener" class="text-slate-800 hover:underline flex items-center space-x-1">
+                  <i class="fa-brands fa-github"></i>
+                  <span>Code Repository</span>
+                </a>
+              {% endif %}
+            </div>
+            <a href="/api/deployments/{{ d.id }}/export-pdf" class="text-slate-700 hover:text-blue-600 font-semibold flex items-center space-x-1">
+              <i class="fa-solid fa-file-pdf text-red-500"></i>
+              <span>Download Case Study PDF</span>
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bg-white p-10 rounded-3xl border border-slate-200 text-center text-xs text-slate-500">
+      This builder has not published any public case studies yet.
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

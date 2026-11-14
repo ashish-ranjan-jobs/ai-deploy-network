@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Builder Dashboard — AI Deploy Network{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Welcome & Profile Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+    <div>
+      <div class="flex items-center space-x-3 mb-2">
+        <h1 class="text-3xl font-black text-slate-900">{{ current_user.full_name }}</h1>
+        {% if current_user.membership %}
+          <span class="gold-badge text-xs font-bold px-3 py-1 rounded-full flex items-center space-x-1">
+            <i class="fa-solid fa-crown text-[10px]"></i>
+            <span>{{ current_user.membership.badge_label }}</span>
+          </span>
+        {% endif %}
+      </div>
+      <p class="text-sm text-slate-600">
+        {{ current_user.title or 'AI Practitioner' }} &bull; {{ current_user.company or 'Independent' }} &bull; {{ current_user.location or 'Global' }}
+      </p>
+    </div>
+
+    <!-- Quick action buttons -->
+    <div class="flex flex-wrap items-center gap-3">
+      <a href="/deployments/new" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition flex items-center space-x-1.5">
+        <i class="fa-solid fa-plus"></i>
+        <span>Add AI Deployment</span>
+      </a>
+      <a href="/profile/{{ current_user.id }}" class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span>Public Profile</span>
+      </a>
+      <a href="/api/builders/{{ current_user.id }}/export-pdf" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5">
+        <i class="fa-solid fa-file-pdf text-red-400"></i>
+        <span>Export PDF Portfolio</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Left Column: Founding Builder Credential Card & Verification Roadmap -->
+    <div class="space-y-6">
+      
+      <!-- Founding Builder Card -->
+      <div class="founding-card rounded-3xl p-6 text-white relative overflow-hidden shadow-2xl">
+        <div class="absolute -right-6 -bottom-6 opacity-10 text-9xl">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center space-x-2">
+            <span class="bg-amber-500 text-slate-950 font-black text-xs px-2 py-1 rounded">AI DEPLOY</span>
+            <span class="text-xs font-semibold text-amber-300">FOUNDING BUILDER</span>
+          </div>
+          <i class="fa-solid fa-shield-halved text-amber-400 text-xl"></i>
+        </div>
+
+        <div class="mb-6">
+          <div class="text-xs text-slate-400 uppercase tracking-widest font-mono">Unique Membership Number</div>
+          <div class="text-4xl font-black text-amber-400 tracking-wider font-mono">
+            {{ current_user.membership.formatted_number if current_user.membership else '#000' }}
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-800/80 flex items-end justify-between">
+          <div>
+            <div class="text-xs text-slate-400">Builder Name</div>
+            <div class="text-sm font-bold text-white">{{ current_user.full_name }}</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-slate-400">Status</div>
+            {% if current_user.is_verified %}
+              <div class="text-xs font-bold text-emerald-400"><i class="fa-solid fa-circle-check mr-1"></i>Verified</div>
+            {% else %}
+              <div class="text-xs font-bold text-amber-300"><i class="fa-solid fa-clock mr-1"></i>Review Pending</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification Roadmap Tracker -->
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center justify-between">
+          <span>Verification Checklist</span>
+          <span class="text-xs text-blue-600 font-semibold lowercase">
+            {% if current_user.is_verified %}verified{% elif deployments %}in review{% else %}action needed{% endif %}
+          </span>
+        </h3>
+
+        <div class="space-y-4">
+          <div class="flex items-start space-x-3 text-xs">
+            <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+              <i class="fa-solid fa-check text-[10px]"></i>
+            </div>
+            <div>
+              <div class="font-bold text-slate-900">1. Register Builder Account</div>
+              <div class="text-slate-500">Free Founding Builder membership assigned.</div>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3 text-xs">
+            <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+              <i class="fa-solid fa-check text-[10px]"></i>
+            </div>
+            <div>
+              <div class="font-bold text-slate-900">2. Complete Builder Profile</div>
+              <div class="text-slate-500">Title, links, and background recorded.</div>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3 text-xs">
+            {% if deployments %}
+              <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-check text-[10px]"></i>
+              </div>
+            {% else %}
+              <div class="w-5 h-5 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                !
+              </div>
+            {% endif %}
+            <div>
+              <div class="font-bold text-slate-900">3. Add Genuine AI Deployment</div>
+              <div class="text-slate-500">
+                {% if deployments %}
+                  {{ deployments|length }} deployment(s) added.
+                {% else %}
+                  <span class="text-amber-600 font-semibold">Add at least one deployment to qualify.</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-3 text-xs">
+            {% if current_user.is_verified %}
+              <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-check text-[10px]"></i>
+              </div>
+              <div>
+                <div class="font-bold text-emerald-700">4. Verified by AI Deploy Network</div>
+                <div class="text-slate-500">Profile certified and discoverable to employers worldwide.</div>
+              </div>
+            {% else %}
+              <div class="w-5 h-5 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-hourglass-half text-[10px]"></i>
+              </div>
+              <div>
+                <div class="font-bold text-slate-700">4. Verification Review</div>
+                <div class="text-slate-500">Reviewed for genuine production deployment & measurable impact.</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Documented Deployments List -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-xl font-black text-slate-900">Your AI Deployments</h2>
+            <p class="text-xs text-slate-500">Document your production models, architecture, and measurable ROI</p>
+          </div>
+          <a href="/deployments/new" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center space-x-1">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add New</span>
+          </a>
+        </div>
+
+        {% if deployments %}
+          <div class="space-y-4">
+            {% for d in deployments %}
+              <div class="p-5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-slate-50/50 transition">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                  <div class="flex items-center space-x-2">
+                    <h3 class="font-bold text-slate-900 text-base">{{ d.title }}</h3>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">{{ d.industry }}</span>
+                  </div>
+                  <div>
+                    {% if d.is_verified %}
+                      <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center space-x-1">
+                        <i class="fa-solid fa-circle-check text-[10px]"></i>
+                        <span>Verified</span>
+                      </span>
+                    {% elif d.verification_status == 'REJECTED' %}
+                      <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-100 text-red-800">
+                        Needs Revision
+                      </span>
+                    {% else %}
+                      <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 flex items-center space-x-1">
+                        <i class="fa-solid fa-clock text-[10px]"></i>
+                        <span>Pending Review</span>
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="text-xs text-slate-500 mb-3">
+                  <strong>Tech Stack:</strong> {{ d.ai_tech_used }} &bull; <strong>Stage:</strong> {{ d.deployment_stage }}
+                </div>
+
+                <div class="bg-emerald-50/80 border border-emerald-100 p-3 rounded-xl mb-3 text-xs">
+                  <div class="font-bold text-emerald-900 uppercase tracking-wide text-[10px]">Measurable Results:</div>
+                  <div class="text-emerald-950 font-medium mt-0.5">{{ d.measurable_results }}</div>
+                </div>
+
+                <div class="flex items-center justify-between pt-3 border-t border-slate-200/60 text-xs">
+                  <div class="text-slate-400">Added on {{ d.created_at.strftime('%b %d, %Y') }}</div>
+                  <div class="flex items-center space-x-3">
+                    <a href="/api/deployments/{{ d.id }}/export-pdf" class="text-slate-600 hover:text-slate-900 font-semibold" title="Export PDF Case Study">
+                      <i class="fa-solid fa-file-pdf mr-1 text-red-500"></i>PDF
+                    </a>
+                    <a href="/deployments/{{ d.id }}/edit" class="text-blue-600 hover:text-blue-800 font-semibold">
+                      Edit
+                    </a>
+                    <form action="/deployments/{{ d.id }}/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this deployment?');" class="inline">
+                      <button type="submit" class="text-red-500 hover:text-red-700 font-semibold">
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="py-12 text-center border-2 border-dashed border-slate-200 rounded-2xl p-6">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3 text-xl">
+              <i class="fa-solid fa-diagram-project"></i>
+            </div>
+            <h4 class="font-bold text-slate-800 text-sm mb-1">No AI Deployments Added Yet</h4>
+            <p class="text-xs text-slate-500 max-w-sm mx-auto mb-4">
+              Add at least one genuine AI Deployment you have built or contributed to, showing measurable results, so your profile can be verified.
+            </p>
+            <a href="/deployments/new" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition inline-flex items-center space-x-1">
+              <i class="fa-solid fa-plus"></i>
+              <span>Add Your First AI Deployment</span>
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
