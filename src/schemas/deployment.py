@@ -12,6 +12,7 @@ class DeploymentBase(BaseModel):
     industry: str
     ai_tech_used: str
     deployment_stage: str = "Production"
+    hardware_target: Optional[str] = "Cloud (GPU/vLLM)"
     problem_statement: str
     solution_description: str
     measurable_results: str
@@ -29,6 +30,7 @@ class DeploymentUpdate(BaseModel):
     industry: Optional[str] = None
     ai_tech_used: Optional[str] = None
     deployment_stage: Optional[str] = None
+    hardware_target: Optional[str] = None
     problem_statement: Optional[str] = None
     solution_description: Optional[str] = None
     measurable_results: Optional[str] = None
@@ -41,6 +43,7 @@ class DeploymentOut(DeploymentBase):
     user_id: int
     is_verified: bool
     verification_status: str
+    verification_hash: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     user: Optional[UserOut] = None

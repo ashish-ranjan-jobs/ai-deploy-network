@@ -1,71 +1,63 @@
 {% extends "base.html" %}
 
-{% block title %}{% if deployment %}Edit AI Deployment{% else %}Document Genuine AI Deployment{% endif %} — AI Deploy Network{% endblock %}
+{% block title %}{% if deployment %}Edit Specification{% else %}Document AI Deployment{% endif %} — AI Deploy Network{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 font-sans">
 
-  <div class="mb-6">
-    <a href="/dashboard" class="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center space-x-1">
-      <i class="fa-solid fa-arrow-left text-[10px]"></i>
-      <span>Back to Dashboard</span>
+  <div class="mb-5 font-mono-code text-xs">
+    <a href="/aideploy/dashboard" class="text-zinc-500 hover:text-zinc-300">
+      &larr; BACK_TO_DASHBOARD
     </a>
   </div>
 
-  <div class="bg-white rounded-3xl border border-slate-200 p-8 sm:p-10 shadow-sm">
-    <div class="mb-8">
-      <span class="text-xs font-bold text-blue-600 uppercase tracking-widest">Builder Case Study</span>
-      <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
-        {% if deployment %}Edit AI Deployment{% else %}Document a Genuine AI Deployment{% endif %}
+  <div class="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-7 sm:p-9 text-xs">
+    
+    <div class="pb-5 border-b border-zinc-800 mb-6">
+      <div class="font-mono-code text-[11px] text-amber-400 mb-1">SPECIFICATION // DEPLOYMENT_ENTRY</div>
+      <h1 class="text-xl font-bold text-white tracking-tight">
+        {% if deployment %}Edit Deployment Specification{% else %}Document Genuine Production Deployment{% endif %}
       </h1>
-      <p class="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
-        Showcase what you've actually built, deployed and achieved. Quality submissions clearly explain the architectural solution and demonstrate measurable, verified business results.
+      <p class="text-xs text-zinc-400 mt-1">
+        Document what you've actually built, deployed and achieved. Quantified production outcomes and architectural details are verified during audit.
       </p>
     </div>
 
     {% if error %}
-      <div class="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center space-x-2">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span>{{ error }}</span>
+      <div class="mb-5 p-3 rounded-md bg-red-950/40 border border-red-800/80 text-red-300 text-xs font-mono-code">
+        [ERROR]: {{ error }}
       </div>
     {% endif %}
 
-    <form action="{% if deployment %}/deployments/{{ deployment.id }}/edit{% else %}/deployments/new{% endif %}" method="POST" class="space-y-6">
+    <form action="{% if deployment %}/aideploy/deployments/{{ deployment.id }}/edit{% else %}/aideploy/deployments/new{% endif %}" method="POST" class="space-y-4">
       
       <div>
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-          Deployment Title *
-        </label>
+        <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">SYSTEM_TITLE *</label>
         <input type="text" name="title" required
                value="{{ deployment.title if deployment else '' }}"
-               placeholder="e.g. Enterprise RAG Pipeline for High-Frequency Regulatory Compliance"
-               class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+               placeholder="e.g. Real-Time RAG Regulatory Audit Pipeline with Hybrid Semantic Search"
+               class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-            Industry / Domain *
-          </label>
-          <select name="industry" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">INDUSTRY_DOMAIN *</label>
+          <select name="industry" required class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 focus:outline-none focus:border-zinc-500 font-mono-code">
             {% set ind = deployment.industry if deployment else 'FinTech' %}
             <option value="FinTech" {% if ind == 'FinTech' %}selected{% endif %}>FinTech / Banking</option>
             <option value="Healthcare" {% if ind == 'Healthcare' %}selected{% endif %}>Healthcare & BioTech</option>
-            <option value="E-Commerce" {% if ind == 'E-Commerce' %}selected{% endif %}>E-Commerce & Retail</option>
             <option value="Enterprise SaaS" {% if ind == 'Enterprise SaaS' %}selected{% endif %}>Enterprise SaaS</option>
+            <option value="E-Commerce" {% if ind == 'E-Commerce' %}selected{% endif %}>E-Commerce & Retail</option>
+            <option value="DevTools" {% if ind == 'DevTools' %}selected{% endif %}>DevTools & MLOps</option>
             <option value="LegalTech" {% if ind == 'LegalTech' %}selected{% endif %}>Legal & Compliance</option>
-            <option value="DevTools" {% if ind == 'DevTools' %}selected{% endif %}>Developer Tools & DevOps</option>
             <option value="Logistics" {% if ind == 'Logistics' %}selected{% endif %}>Logistics & Supply Chain</option>
-            <option value="Education" {% if ind == 'Education' %}selected{% endif %}>Education & EdTech</option>
             <option value="Other" {% if ind == 'Other' %}selected{% endif %}>Other</option>
           </select>
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-            Deployment Stage *
-          </label>
-          <select name="deployment_stage" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">DEPLOYMENT_STAGE *</label>
+          <select name="deployment_stage" required class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 focus:outline-none focus:border-zinc-500 font-mono-code">
             {% set stage = deployment.deployment_stage if deployment else 'Production' %}
             <option value="Production" {% if stage == 'Production' %}selected{% endif %}>Production (Live Users)</option>
             <option value="Enterprise Rollout" {% if stage == 'Enterprise Rollout' %}selected{% endif %}>Enterprise Rollout</option>
@@ -75,82 +67,78 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-            AI Technology & Stack Used *
-          </label>
+          <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">AI_SYSTEMS_STACK *</label>
           <input type="text" name="ai_tech_used" required
                  value="{{ deployment.ai_tech_used if deployment else '' }}"
-                 placeholder="e.g. Claude 3.5 Sonnet, pgvector, LangChain, FastAPI"
-                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                 placeholder="e.g. Claude 3.5, pgvector, LangChain, vLLM, Triton"
+                 class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 font-mono-code">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-            Client / Organisation (Optional)
-          </label>
-          <input type="text" name="client_or_company"
-                 value="{{ deployment.client_or_company if deployment else '' }}"
-                 placeholder="e.g. Tier-1 Financial Firm / Confidential"
-                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">HARDWARE_OR_INFERENCE_TARGET</label>
+          <input type="text" name="hardware_target"
+                 value="{{ deployment.hardware_target if deployment else 'Cloud (NVIDIA A100 / vLLM)' }}"
+                 placeholder="e.g. NVIDIA A100 Cluster, AWS Inferentia2, CPU"
+                 class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 font-mono-code">
         </div>
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-          1. Problem Statement *
-        </label>
-        <p class="text-[11px] text-slate-500 mb-1">What challenge did this AI deployment address? What was the pre-existing workflow or bottleneck?</p>
+        <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">ORGANISATION_OR_CLIENT (OPTIONAL)</label>
+        <input type="text" name="client_or_company"
+               value="{{ deployment.client_or_company if deployment else '' }}"
+               placeholder="e.g. Fortune 500 Financial Group / Open-Source"
+               class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500">
+      </div>
+
+      <div>
+        <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">1. PROBLEM STATEMENT & BASELINE *</label>
+        <p class="text-[10px] text-zinc-500 mb-1">What challenge did this implementation address? What was the pre-existing workflow or bottleneck?</p>
         <textarea name="problem_statement" rows="3" required
                   placeholder="e.g. Compliance team spent over 40 hours weekly reviewing 1,200+ regulatory filings manually, resulting in a 72-hour delay in flagging critical compliance notices..."
-                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ deployment.problem_statement if deployment else '' }}</textarea>
+                  class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"></textarea>
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-          2. Engineered Solution & Architecture *
-        </label>
-        <p class="text-[11px] text-slate-500 mb-1">How did you design and implement the AI system? What models, vector search, or orchestration were used?</p>
-        <textarea name="solution_description" rows="4" required
-                  placeholder="e.g. Built a hybrid search RAG pipeline using pgvector and embedding model, orchestrating document chunking, prompt routing, and self-consistency validation with fallback models..."
-                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{{ deployment.solution_description if deployment else '' }}</textarea>
+        <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">2. ENGINEERED SOLUTION & ARCHITECTURE *</label>
+        <p class="text-[10px] text-zinc-500 mb-1">How did you design the AI system? Routing, chunking, retrieval topology, model fallback, or evaluation harness?</p>
+        <textarea name="solution_description" rows="3" required
+                  placeholder="e.g. Implemented a hybrid vector-BM25 retrieval engine with reranking model, automated citation mapping, and self-consistency validation with fallback models..."
+                  class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"></textarea>
       </div>
 
-      <div class="bg-emerald-50/70 border border-emerald-200 p-4 rounded-2xl">
-        <label class="block text-xs font-bold text-emerald-900 uppercase tracking-wider mb-1 flex items-center space-x-1">
-          <i class="fa-solid fa-chart-line text-emerald-700"></i>
-          <span>3. Measurable Results & Achieved Metrics *</span>
-        </label>
-        <p class="text-[11px] text-emerald-800 mb-1.5">Crucial for verification: provide quantifiable stats (e.g. % accuracy, hours saved, \$ cost reduction, latency).</p>
+      <div class="p-3 bg-zinc-950 border border-zinc-800 rounded-md">
+        <label class="block text-[11px] font-mono-code text-emerald-400 mb-1">3. MEASURABLE RESULTS & QUANTIFIED DELTA *</label>
+        <p class="text-[10px] text-zinc-400 mb-1.5">Essential for verification: provide hard numbers (p95 latency, % accuracy benchmark, contractor hours eliminated, $ saved).</p>
         <textarea name="measurable_results" rows="3" required
                   placeholder="e.g. Reduced review latency from 72h down to 4.2 minutes (94% reduction). Achieved 99.4% precision on audited filings. Saved an estimated $310k in annual compliance contractor costs."
-                  class="w-full px-3.5 py-2.5 rounded-xl border border-emerald-300 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">{{ deployment.measurable_results if deployment else '' }}</textarea>
+                  class="w-full bg-zinc-900 border border-zinc-700 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 font-mono-code text-xs">{{ deployment.measurable_results if deployment else '' }}</textarea>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Live Demo / Product URL (Optional)</label>
+          <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">LIVE_DEMO_URL (OPTIONAL)</label>
           <input type="url" name="live_demo_url"
                  value="{{ deployment.live_demo_url if deployment else '' }}"
-                 placeholder="https://app.example.com"
-                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                 placeholder="https://app.domain.io"
+                 class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 font-mono-code">
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Repository URL (Optional)</label>
+          <label class="block text-[11px] font-mono-code text-zinc-400 mb-1">REPOSITORY_URL (OPTIONAL)</label>
           <input type="url" name="repo_url"
                  value="{{ deployment.repo_url if deployment else '' }}"
                  placeholder="https://github.com/org/repo"
-                 class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                 class="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3 py-2 text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500 font-mono-code">
         </div>
       </div>
 
-      <div class="pt-4 flex items-center justify-end space-x-3">
-        <a href="/dashboard" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition">
-          Cancel
+      <div class="pt-3 flex items-center justify-end space-x-3 font-mono-code">
+        <a href="/aideploy/dashboard" class="text-zinc-400 hover:text-zinc-200 px-3 py-1.5">
+          CANCEL
         </a>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-md transition flex items-center space-x-1.5">
-          <i class="fa-solid fa-paper-plane"></i>
-          <span>{% if deployment %}Update & Resubmit for Review{% else %}Publish & Submit for Verification{% endif %}</span>
+        <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold px-4 py-2 rounded-md transition text-xs">
+          {% if deployment %}UPDATE_SPEC &rarr;{% else %}SUBMIT_FOR_AUDIT &rarr;{% endif %}
         </button>
       </div>
 

@@ -36,6 +36,12 @@ router = APIRouter(include_in_schema=False)
 
 
 @router.get("/", response_class=HTMLResponse)
+def root_redirect():
+    return RedirectResponse(url="/aideploy/", status_code=status.HTTP_302_FOUND)
+
+
+@router.get("/aideploy", response_class=HTMLResponse)
+@router.get("/aideploy/", response_class=HTMLResponse)
 def home_page(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_optional),
@@ -59,21 +65,23 @@ def home_page(
     )
 
 
-@router.get("/register", response_class=HTMLResponse)
+@router.get("/aideploy/register", response_class=HTMLResponse)
 def register_page(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_optional),
+    db: Session = Depends(get_db),
 ):
     if current_user:
-        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    stats = get_membership_stats(db)
     return templates.TemplateResponse(
         request=request,
         name="register.html",
-        context={"current_user": None},
+        context={"current_user": None, "stats": stats},
     )
 
 
-@router.post("/register")
+@router.post("/aideploy/register")
 def handle_register(
     request: Request,
     first_name: str = Form(...),
@@ -88,6 +96,7 @@ def handle_register(
     bio: Optional[str] = Form(None),
     db: Session = Depends(get_db),
 ):
+    stats = get_membership_stats(db)
     try:
         user_in = UserRegister(
             first_name=first_name,
@@ -106,81 +115,86 @@ def handle_register(
             return templates.TemplateResponse(
                 request=request,
                 name="register.html",
-                context={"current_user": None, "error": "Email is already registered. Please sign in."},
+                context={"current_user": None, "stats": stats, "error": "Email is already registered. Please sign in."},
                 status_code=400,
             )
 
         user = register_builder(db, user_in)
         token = create_access_token({"sub": str(user.id)})
-        resp = RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
-        resp.set_cookie("access_token", f"Bearer {token}", httponly=True, samesite="lax", max_age=86400)
+        resp = RedirectResponse(url="/aideploy/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+        resp.set_cookie("access_token", f"Bearer {token}", httponly=True, samesite="lax", max_age=86400, path="/")
         return resp
     except Exception as e:
         return templates.TemplateResponse(
             request=request,
             name="register.html",
-            context={"current_user": None, "error": str(e)},
+            context={"current_user": None, "stats": stats, "error": str(e)},
             status_code=400,
         )
 
 
-@router.get("/login", response_class=HTMLResponse)
+@router.get("/aideploy/login", response_class=HTMLResponse)
 def login_page(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_optional),
+    db: Session = Depends(get_db),
 ):
     if current_user:
-        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    stats = get_membership_stats(db)
     return templates.TemplateResponse(
         request=request,
         name="login.html",
-        context={"current_user": None},
+        context={"current_user": None, "stats": stats},
     )
 
 
-@router.post("/login")
+@router.post("/aideploy/login")
 def handle_login(
     request: Request,
     email: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db),
 ):
+    stats = get_membership_stats(db)
     user = authenticate_user(db, email, password)
     if not user:
         return templates.TemplateResponse(
             request=request,
             name="login.html",
-            context={"current_user": None, "error": "Invalid email address or password."},
+            context={"current_user": None, "stats": stats, "error": "Invalid email or credentials."},
             status_code=401,
         )
 
     token = create_access_token({"sub": str(user.id)})
-    resp = RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
-    resp.set_cookie("access_token", f"Bearer {token}", httponly=True, samesite="lax", max_age=86400)
+    resp = RedirectResponse(url="/aideploy/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    resp.set_cookie("access_token", f"Bearer {token}", httponly=True, samesite="lax", max_age=86400, path="/")
     return resp
 
 
-@router.get("/dashboard", response_class=HTMLResponse)
+@router.get("/aideploy/dashboard", response_class=HTMLResponse)
 def dashboard_page(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     if not current_user:
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/login", status_code=status.HTTP_303_SEE_OTHER)
 
+    stats = get_membership_stats(db)
     deployments = list_user_deployments(db, current_user.id)
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
         context={
             "current_user": current_user,
+            "stats": stats,
             "deployments": deployments,
         },
     )
 
 
-@router.get("/profile/{user_id}", response_class=HTMLResponse)
+@router.get("/aideploy/profile/{user_id}", response_class=HTMLResponse)
 def public_profile_page(
     user_id: int,
     request: Request,
@@ -189,35 +203,39 @@ def public_profile_page(
 ):
     builder = get_user_by_id(db, user_id=user_id)
     if not builder:
-        return RedirectResponse(url="/search", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/search", status_code=status.HTTP_303_SEE_OTHER)
 
+    stats = get_membership_stats(db)
     deployments = list_user_deployments(db, user_id=user_id)
     return templates.TemplateResponse(
         request=request,
         name="profile.html",
         context={
             "current_user": current_user,
+            "stats": stats,
             "builder": builder,
             "deployments": deployments,
         },
     )
 
 
-@router.get("/deployments/new", response_class=HTMLResponse)
+@router.get("/aideploy/deployments/new", response_class=HTMLResponse)
 def new_deployment_page(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_optional),
+    db: Session = Depends(get_db),
 ):
     if not current_user:
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/login", status_code=status.HTTP_303_SEE_OTHER)
+    stats = get_membership_stats(db)
     return templates.TemplateResponse(
         request=request,
         name="deployment_form.html",
-        context={"current_user": current_user, "deployment": None},
+        context={"request": request, "current_user": current_user, "stats": stats, "deployment": None},
     )
 
 
-@router.post("/deployments/new")
+@router.post("/aideploy/deployments/new")
 def handle_new_deployment(
     request: Request,
     title: str = Form(...),
@@ -227,6 +245,7 @@ def handle_new_deployment(
     problem_statement: str = Form(...),
     solution_description: str = Form(...),
     measurable_results: str = Form(...),
+    hardware_target: Optional[str] = Form(None),
     client_or_company: Optional[str] = Form(None),
     live_demo_url: Optional[str] = Form(None),
     repo_url: Optional[str] = Form(None),
@@ -234,12 +253,13 @@ def handle_new_deployment(
     db: Session = Depends(get_db),
 ):
     if not current_user:
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/login", status_code=status.HTTP_303_SEE_OTHER)
 
     dep_in = DeploymentCreate(
         title=title,
         industry=industry,
         deployment_stage=deployment_stage,
+        hardware_target=hardware_target or "Cloud (NVIDIA A100 / vLLM)",
         ai_tech_used=ai_tech_used,
         problem_statement=problem_statement,
         solution_description=solution_description,
@@ -249,10 +269,10 @@ def handle_new_deployment(
         repo_url=repo_url or None,
     )
     create_deployment(db, current_user.id, dep_in)
-    return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/aideploy/dashboard", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@router.get("/deployments/{deployment_id}/edit", response_class=HTMLResponse)
+@router.get("/aideploy/deployments/{deployment_id}/edit", response_class=HTMLResponse)
 def edit_deployment_page(
     deployment_id: int,
     request: Request,
@@ -260,20 +280,21 @@ def edit_deployment_page(
     db: Session = Depends(get_db),
 ):
     if not current_user:
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/login", status_code=status.HTTP_303_SEE_OTHER)
 
     deployment = get_deployment_by_id(db, deployment_id)
     if not deployment or deployment.user_id != current_user.id:
-        return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/dashboard", status_code=status.HTTP_303_SEE_OTHER)
 
+    stats = get_membership_stats(db)
     return templates.TemplateResponse(
         request=request,
         name="deployment_form.html",
-        context={"current_user": current_user, "deployment": deployment},
+        context={"request": request, "current_user": current_user, "stats": stats, "deployment": deployment},
     )
 
 
-@router.post("/deployments/{deployment_id}/edit")
+@router.post("/aideploy/deployments/{deployment_id}/edit")
 def handle_edit_deployment(
     deployment_id: int,
     request: Request,
@@ -284,6 +305,7 @@ def handle_edit_deployment(
     problem_statement: str = Form(...),
     solution_description: str = Form(...),
     measurable_results: str = Form(...),
+    hardware_target: Optional[str] = Form(None),
     client_or_company: Optional[str] = Form(None),
     live_demo_url: Optional[str] = Form(None),
     repo_url: Optional[str] = Form(None),
@@ -291,12 +313,13 @@ def handle_edit_deployment(
     db: Session = Depends(get_db),
 ):
     if not current_user:
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/login", status_code=status.HTTP_303_SEE_OTHER)
 
     dep_update = DeploymentUpdate(
         title=title,
         industry=industry,
         deployment_stage=deployment_stage,
+        hardware_target=hardware_target or "Cloud (NVIDIA A100 / vLLM)",
         ai_tech_used=ai_tech_used,
         problem_statement=problem_statement,
         solution_description=solution_description,
@@ -306,10 +329,10 @@ def handle_edit_deployment(
         repo_url=repo_url or None,
     )
     update_deployment(db, deployment_id, current_user.id, dep_update)
-    return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/aideploy/dashboard", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@router.post("/deployments/{deployment_id}/delete")
+@router.post("/aideploy/deployments/{deployment_id}/delete")
 def handle_delete_deployment(
     deployment_id: int,
     current_user: Optional[User] = Depends(get_current_user_optional),
@@ -317,10 +340,10 @@ def handle_delete_deployment(
 ):
     if current_user:
         delete_deployment(db, deployment_id, current_user.id)
-    return RedirectResponse(url="/dashboard", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/aideploy/dashboard", status_code=status.HTTP_303_SEE_OTHER)
 
 
-@router.get("/search", response_class=HTMLResponse)
+@router.get("/aideploy/search", response_class=HTMLResponse)
 def search_page(
     request: Request,
     q: Optional[str] = None,
@@ -340,6 +363,7 @@ def search_page(
         verified_only=is_verified_only,
     )
     builders = list_builders(db, verified_only=is_verified_only)
+    stats = get_membership_stats(db)
 
     return templates.TemplateResponse(
         request=request,
@@ -353,18 +377,19 @@ def search_page(
             "deployments": deployments,
             "builders": builders,
             "current_user": current_user,
+            "stats": stats,
         },
     )
 
 
-@router.get("/admin", response_class=HTMLResponse)
+@router.get("/aideploy/admin", response_class=HTMLResponse)
 def admin_page(
     request: Request,
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     if not current_user or not current_user.is_admin:
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/login", status_code=status.HTTP_303_SEE_OTHER)
 
     pending = (
         db.query(Deployment)
@@ -391,12 +416,14 @@ def admin_page(
                 "verified_deployments": verified_deps,
                 "pending_deployments": pending_deps,
                 "total_founding_members": founding_count,
+                "slots_remaining": max(0, 500 - founding_count),
+                "max_slots": 500,
             },
         },
     )
 
 
-@router.post("/admin/verify/{deployment_id}")
+@router.post("/aideploy/admin/verify/{deployment_id}")
 def handle_admin_verify(
     deployment_id: int,
     status: str = Form(...),
@@ -405,8 +432,8 @@ def handle_admin_verify(
     db: Session = Depends(get_db),
 ):
     if not current_user or not current_user.is_admin:
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        return RedirectResponse(url="/aideploy/login", status_code=status.HTTP_303_SEE_OTHER)
 
     review_in = VerificationReview(status=status, feedback_notes=feedback_notes)
     review_deployment(db, deployment_id, reviewer_id=current_user.id, review_data=review_in)
-    return RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/aideploy/admin", status_code=status.HTTP_303_SEE_OTHER)
